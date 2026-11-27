@@ -1,0 +1,156 @@
+EVIDENCIAS - Ejercicio: Git y Java en un Dev Container
+Salida de los pasos 2 a 8, generada con: bash reproducir.sh
+
+=================== 2. Compilar y ejecutar los ejemplos ===================
+$ javac -d bin src/Saludo.java src/Calculadora.java
+$ java -cp bin Saludo
+Hola desde el Dev Container
+$ java -cp bin Calculadora
+Suma: 8
+Resta: 2
+-- Modifico el mensaje de Saludo.java y vuelvo a compilar --
+$ javac -d bin src/Saludo.java
+$ java -cp bin Saludo
+Hola desde el Dev Container con Git
+
+=================== 3. Preparar el repositorio ===================
+$ git status --short
+?? .gitignore
+?? README.md
+?? src/
+$ git add README.md .gitignore src/Saludo.java src/Calculadora.java
+$ git diff --cached --stat
+ .gitignore           |  18 ++++
+ README.md            | 234 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/Calculadora.java |  14 +++
+ src/Saludo.java      |   5 ++
+ 4 files changed, 271 insertions(+)
+$ git diff --cached --name-only | grep -c '\.class'   (debe ser 0)
+0
+
+=================== 4. Crear y corregir commits ===================
+$ git commit -m Agrega ejercicio de Git y Java
+[main (root-commit) 66151d3] Agrega ejercicio de Git y Java
+ 4 files changed, 271 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 src/Calculadora.java
+ create mode 100644 src/Saludo.java
+$ git log --oneline -1
+66151d3 Agrega ejercicio de Git y Java
+$ git diff
+diff --git a/README.md b/README.md
+index b1344c3..4ce24ff 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+ # Ejercicio: Git y Java en un Dev Container
+ 
+-Este ejercicio practica los comandos básicos de Git dentro del contenedor de desarrollo de este repositorio. Completa las actividades en orden y marca cada casilla solamente después de comprobar el resultado.
++Este ejercicio practica los comandos básicos de Git dentro del contenedor de desarrollo de este repositorio. Completa las actividades en el orden indicado y marca cada casilla solamente después de comprobar el resultado.
+ 
+ ## Objetivo y forma de trabajo
+ 
+$ git add README.md
+$ git diff --cached --stat
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git commit --amend --no-edit
+[main 0db2f76] Agrega ejercicio de Git y Java
+ Date: Fri Nov 27 08:28:26 2026 +0000
+ 4 files changed, 271 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 src/Calculadora.java
+ create mode 100644 src/Saludo.java
+$ git log --oneline -1
+0db2f76 Agrega ejercicio de Git y Java
+$ git show --stat --oneline HEAD
+0db2f76 Agrega ejercicio de Git y Java
+ .gitignore           |  18 ++++
+ README.md            | 234 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/Calculadora.java |  14 +++
+ src/Saludo.java      |   5 ++
+ 4 files changed, 271 insertions(+)
+
+=================== 5. Rama y merge ===================
+$ git switch -c mejora-instrucciones
+Switched to a new branch 'mejora-instrucciones'
+$ git add README.md
+$ git commit -m Aclara las instrucciones del ejercicio
+[mejora-instrucciones 186841b] Aclara las instrucciones del ejercicio
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+$ git switch main
+Switched to branch 'main'
+$ git merge mejora-instrucciones
+Updating 0db2f76..186841b
+Fast-forward
+ README.md | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+$ git log --oneline --all --decorate
+186841b (HEAD -> main, mejora-instrucciones) Aclara las instrucciones del ejercicio
+0db2f76 Agrega ejercicio de Git y Java
+
+=================== 6. Remoto ===================
+$ git remote -v
+$ git branch --all
+* main
+  mejora-instrucciones
+(Repositorio de práctica sin remoto: se intenta push y pull)
+$ git push -u origin main
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+$ git pull
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details.
+
+    git pull <remote> <branch>
+
+If you wish to set tracking information for this branch you can do so with:
+
+    git branch --set-upstream-to=<remote>/<branch> main
+
+
+=================== 7. Parche ===================
+$ git diff HEAD^ HEAD > cambio.patch
+$ head -n 25 cambio.patch
+diff --git a/README.md b/README.md
+index 4ce24ff..62d0884 100644
+--- a/README.md
++++ b/README.md
+@@ -231,4 +231,5 @@ Antes de entregar, verifica todo lo siguiente:
+ - [x] El historial contiene commits descriptivos.
+ - [x] Existe una rama integrada mediante `merge`.
+ - [x] El repositorio conserva los archivos `.java`, pero no archivos `.class`, `.bin` ni `.javac` versionados.
+-- [x] El README conserva todas las casillas marcadas como evidencia de la práctica.
+\ No newline at end of file
++- [x] El README conserva todas las casillas marcadas como evidencia de la práctica.
++> Aclaración: ejecuta los comandos desde la raíz del repositorio.
+$ git diff > cambios-sin-commit.patch   (0 bytes: no hay cambios sin preparar)
+
+=================== 8. Comprobar .gitignore ===================
+$ git check-ignore -v bin/Saludo.class ejemplo.bin ejemplo.javac
+.gitignore:3:bin/	bin/Saludo.class
+.gitignore:4:*.bin	ejemplo.bin
+.gitignore:5:*.javac	ejemplo.javac
+$ git status --ignored --short
+!! bin/
+!! cambio.patch
+!! cambios-sin-commit.patch
+!! ejemplo.bin
+!! ejemplo.javac
+$ git status --short
+(sin salida arriba = no hay archivos sin seguimiento ni cambios pendientes)
+
+=================== Lista final ===================
+$ git status
+On branch main
+nothing to commit, working tree clean
+$ git log --oneline
+186841b Aclara las instrucciones del ejercicio
+0db2f76 Agrega ejercicio de Git y Java
+
